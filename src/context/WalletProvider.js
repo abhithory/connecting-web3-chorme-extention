@@ -16,7 +16,7 @@ export function withWallet(Component) {
 const WalletProvider = React.memo(({ children }) => {
     const [chainId, setChainId] = useState(null);
     const [account, setAccount] = useState(null);
-    const [provider, setProvider] = useState(null);
+    const [ethereumProvider, setEthereumProvider] = useState(null);
     const [isConnected, setIsConnected] = useState(false);
     const [connectingWallet, setConnectingWallet] = useState(false)
 
@@ -38,19 +38,19 @@ const WalletProvider = React.memo(({ children }) => {
                 }),
                 provider.request({ method: 'eth_chainId' }),
             ]);
-            return [accounts, chainId];
+            return [accounts, chainId, provider];
         }
         return false;
     }
 
     const connectWallet = async () => {
         try {
-            const provider = getProvider();
-            const [accounts, chainId] = await getAccounts(provider);
+            const _provider = getProvider();
+            const [accounts, chainId, provider] = await getAccounts(_provider);
             if (accounts && chainId) {
                 setConnectingWallet(true);
                 const account = accounts[0];
-                setProvider(provider)
+                setEthereumProvider(provider)
                 setAccount(account);
                 setChainId(chainId);
                 setIsConnected(true);
@@ -67,7 +67,7 @@ const WalletProvider = React.memo(({ children }) => {
             setAccount(null);
             setChainId(null);
             setIsConnected(false);
-            setProvider(null);
+            setEthereumProvider(null);
         } catch (e) {
             console.log(e);
         }
@@ -80,7 +80,7 @@ const WalletProvider = React.memo(({ children }) => {
                 connectWallet,
                 isConnected,
                 connectingWallet,
-                provider,
+                provider: ethereumProvider,
                 chainId,
                 account
             }}
